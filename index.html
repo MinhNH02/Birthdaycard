@@ -63,7 +63,7 @@ body{
     50%{ transform: translateY(-10px); }
 }
 
-.page-wrap{ position:relative; z-index:1; max-width:480px; width:100%; margin:0 auto; text-align:center; display:none; min-height:100vh; padding:20px 0; box-sizing:border-box; }
+.page-wrap{ position:relative; z-index:1; max-width:480px; width:92%; margin:0 auto; text-align:center; display:none; min-height:100vh; padding:20px 0; box-sizing:border-box; }
 .page-wrap.show{ display:flex; flex-direction:column; justify-content:center; align-items:center; }
 .title{
     font-size:1.4rem;
@@ -92,8 +92,8 @@ body{
 .card-wrap{
     perspective:1800px;
     margin:20px auto;
-    width:75%;
     max-width:420px;
+    width:90%;
 }
 .card-spread{
     position:relative;
@@ -192,7 +192,7 @@ body{
 #passwordView .landing.fade-out{ opacity:0; pointer-events:none; }
 .password-view{ display:flex; justify-content:center; align-items:center; width:100%; }
 .password-view .pwd-card{
-    display:flex; align-items:stretch; width:580px; max-width:94%;
+    display:flex; align-items:stretch; max-width:580px; width:90%;
     margin:0 auto;
     background: rgba(255,255,255,0.4); backdrop-filter: blur(15px);
     border-radius:28px; box-shadow:0 15px 40px rgba(0,0,0,0.15); position:relative; z-index:1;
@@ -385,21 +385,21 @@ body{
     z-index:50;
 }
 
-/* 2️⃣ Canvas gấp đôi, 2 nửa giống nhau để loop mượt */
+/* 2️⃣ Canvas cao gấp đôi, 2 nửa trên/dưới giống nhau để loop trôi từ trên xuống */
 .canvas{
     position:absolute;
-    width:200vw;
-    height:100vh;
+    width:100vw;
+    height:200vh;
     top:0;
     left:0;
     will-change:transform;
     backface-visibility:hidden;
 }
 .canvas-layer-1{
-    animation: moveRight 18s linear infinite;
+    animation: moveDown 18s linear infinite;
 }
 .canvas-layer-2{
-    animation: moveRight 12s linear infinite;
+    animation: moveDown 12s linear infinite;
 }
 
 /* 3️⃣ Ảnh rải loạn (position absolute) */
@@ -417,10 +417,10 @@ body{
     opacity:0.85;
 }
 
-/* 4️⃣ Trôi trái → phải, loop vô tận không giật */
-@keyframes moveRight{
-    0%{ transform: translateX(-50%); }
-    100%{ transform: translateX(0); }
+/* 4️⃣ Trôi từ trên xuống, loop vô tận không giật */
+@keyframes moveDown{
+    0%{ transform: translateY(0); }
+    100%{ transform: translateY(-50%); }
 }
 
 #canvas-confetti{ position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:100; }
@@ -448,6 +448,59 @@ body{
     background:#fff;
 }
 .btn-speaker.playing{ background: rgba(255,182,193,0.95); }
+
+/* Responsive mobile */
+@media (max-width: 768px){
+    body{ padding:12px; }
+    .page-wrap{ max-width:100%; padding:12px 0; }
+    .title{ font-size:1.15rem; }
+    .subtitle{ font-size:1.25rem; }
+    .password-view .pwd-card{
+        flex-direction:column;
+        width:95%;
+        max-width:100%;
+        border-radius:20px;
+    }
+    .password-view .pwd-card-img{
+        flex:none;
+        width:100%;
+        min-width:0;
+        min-height:180px;
+        border-radius:20px 20px 0 0;
+    }
+    .password-view .pwd-card .card-body{ padding:18px; }
+    .password-view .pwd-title{ font-size:15px; margin-bottom:12px; }
+    .password-view .password-display{ font-size:17px; padding:10px 12px; min-height:24px; margin-bottom:16px; }
+    .password-view .keypad{ gap:8px; }
+    .password-view .key{ padding:10px; font-size:15px; }
+    .card-wrap{ width:92%; max-width:100%; }
+    .card-spread{ min-height:280px; }
+    .inside-img{ min-height:220px; }
+    .gift-box-wrap{ transform: scale(0.85); transform-origin:center bottom; }
+    .gift-page{ min-height:60vh; }
+    .btn-open-gift, .btn-next-page{ padding:12px 24px; font-size:0.95rem; }
+    .canvas img{ width:120px; height:155px; }
+    .canvas-layer-2 img{ width:85px; height:115px; }
+    .memory-img{ width:120px; }
+    .memory-img.hero{ bottom:120px; }
+    .btn-speaker{ width:44px; height:44px; bottom:16px; right:16px; font-size:20px; }
+}
+@media (max-width: 480px){
+    body{ padding:8px; }
+    .title{ font-size:1rem; }
+    .subtitle{ font-size:1.1rem; }
+    .password-view .pwd-card-img{ min-height:150px; }
+    .password-view .pwd-card .card-body{ padding:14px; }
+    .password-view .pwd-title{ font-size:14px; }
+    .password-view .key{ padding:8px; font-size:14px; }
+    .card-spread{ min-height:240px; }
+    .inside-img{ min-height:180px; }
+    .gift-box-wrap{ transform: scale(0.75); }
+    .canvas img{ width:90px; height:120px; }
+    .canvas-layer-2 img{ width:70px; height:95px; }
+    .memory-img{ width:100px; }
+    .memory-img.hero{ bottom:100px; }
+}
 </style>
 </head>
 <body>
@@ -620,19 +673,20 @@ function randomizeMarqueePositions(canvasEl){
     var images = canvasEl.querySelectorAll("img");
     var n = images.length;
     var half = n / 2;
-    var spread = 42;
-    var tops = [];
-    var lefts1 = [];
+    var vSpread = 42;
+    var hSpread = 75;
+    var tops1 = [];
+    var lefts = [];
     for (var i = 0; i < half; i++) {
-        tops.push(Math.random() * 68 + 6);
-        lefts1.push((i / (half - 1 || 1)) * spread + Math.random() * 4);
+        tops1.push((i / (half - 1 || 1)) * vSpread + Math.random() * 5);
+        lefts.push(Math.random() * hSpread + 5);
     }
     images.forEach(function(img, i){
-        img.style.top = tops[i % half] + "%";
+        img.style.left = lefts[i % half] + "%";
         if (i < half) {
-            img.style.left = lefts1[i] + "%";
+            img.style.top = tops1[i] + "%";
         } else {
-            img.style.left = (50 + lefts1[i - half]) + "%";
+            img.style.top = (50 + tops1[i - half]) + "%";
         }
     });
 }
